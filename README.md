@@ -1,37 +1,108 @@
-## Welcome to GitHub Pages
+# Argentina-UTS
+## Argentina Unreal Time Strategy
 
-You can use the [editor on GitHub](https://github.com/eibertek/Argentina-UTS/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+Juego de estrategia online que permite Jugar a ser presidente
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+Nuevo Juego --->
+            Elegir Partido
 
-### Markdown
+            Izquierda  ------------------------------------- Derecha
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+            Comunista
 
-```markdown
-Syntax highlighted code block
+                    De Izquierda
 
-# Header 1
-## Header 2
-### Header 3
+                              Radicalismo
 
-- Bulleted
-- List
+                                        Peronismo
 
-1. Numbered
-2. List
+                                                Nacional Socialismo
 
-**Bold** and _Italic_ and `Code` text
+                                                             MIlitar (Estado de sitio)
+        Elegir Partido Nuevo
 
-[Link](url) and ![Image](src)
-```
+Segunda pantalla:
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+- Carrera Electoral
+- Empezar directamente con la eleccion ganada
 
-### Jekyll Themes
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/eibertek/Argentina-UTS/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+Dificultad
 
-### Support or Contact
+- la dificultad se describe con ciertos parametros
+        Cantidad de Oficialismo en diputados    25%  50%  65%
+        Cantidad de Oficialismo en senadores    25%  50%  65%
+        Nivel de agresividad de los Medios      Baja Media Alta
+        Nivel de competencia de la oposicion    contra moderado diplomatico consentidor
+        Poder Judicial                          imparcial contra favor
+        Estado de la opinion publica            contra moderado favor
+        Gobernadores Provincias                 contra a favor (Elegir provincias)
+        Estado de la economia
+            Reservas                            4B  20B    40B  ___
+            Deuda Externa
+                FMI                             20B 40B 100B
+                Otros                           _______
+                [ + ]                           _______
+        Estado Energetico                       -10KW/Persona   20KW/Persona 60Kw/Persona
+        Ministerios
+            Ciencia                             Deficit  Estable  Superavit
+            Cultura                             Deficit  Estable  Superavit
+            Trasnporte                          Deficit  Estable  Superavit
+            Trabajo                             Deficit  Estable  Superavit
+            Seguridad                           Deficit  Estable  Superavit
+        Desocupacion                            1%  10%   30%     ___
 
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+Empezar Juego
+
+    Crear politico
+            Nombre
+            Apellido
+            Edad
+            Titulo Abogado / Doctor / Ingeniero / Ninguno
+            Partido politico
+            Cantidad de puntos totales para llenar son 50 por punto
+                Honestidad  -100 a 100
+                Lealtad  -100 a 100
+                Cultura   -100 a 100
+                Inteligencia    -100 a 100
+                RRPP       -100 a 100
+
+    Elegir Companero de formula (vicePresidente)
+    Elegir Ministros
+            Se tienen politicos default o se pueden crear los politicos
+            Economia
+            Salud
+            Seguridad
+            Interior
+            Educacion
+            Trabajo
+            Agencia Federal Inteligencia
+            Jefe de Gabinete
+            Agricultura
+            Exterior
+            Produccion
+            Defensa
+
+
+    Una vez se eligen los ministros comienza el juego Semana a Semana
+
+    Ejemplo Semana 1
+        Sistema aleatorio de problemas
+                - Sueldos docentes
+                  Soluciones:
+                        Aumento sacado de Reservas - 10B
+                - Sindicatos
+                        Aeropuerto
+                        Camioneros
+                - Planes
+                - Tarifas
+                - Impuestos
+                - Moneda
+
+        Medidas - deben haber botones que permitan medidas y estas van a repercutir en ciertos indices.
+        por ejemplo sacar el iva o bajarlo incremente la opinion publica pero baja los ingresos y si es negativo puede provocar Deficit
+
+    Devaluar la moneda
+    https://realpolitik.com.ar/nota/31852/todo-lo-malo-tiene-algo-bueno--los-efectos-positivos-y-negativos-de-la-devaluacion/
+
+
