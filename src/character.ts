@@ -1,7 +1,7 @@
 export default class Character {
     private name:String;
     private lastname:String;
-    private age:String;
+    private age:Number;
     private degree:String;
     private party:String;
     private stats:{

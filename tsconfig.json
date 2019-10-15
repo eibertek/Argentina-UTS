@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+      "sourceMap": true,
+      "module": "amd",
+      "target": "esnext",
+      "baseUrl": ".",
+      "paths": {
+        "*.ts": ["*"]
+      }      
+    }
+  }
