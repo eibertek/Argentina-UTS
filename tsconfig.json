@@ -2,10 +2,12 @@
     "compilerOptions": {
       "sourceMap": true,
       "module": "amd",
+      "moduleResolution": "node",
       "target": "esnext",
       "baseUrl": ".",
       "paths": {
         "*.ts": ["*"]
-      }      
+      },
+      "allowSyntheticDefaultImports": true      
     }
   }

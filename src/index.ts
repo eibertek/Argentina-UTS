@@ -1,4 +1,6 @@
+import * as moment from 'moment';
 import Character from './character';
+import Tasks from './Tasks/Tasks';
 
 const options = {
     name: 'Mariano',
@@ -15,4 +17,15 @@ const options = {
     },
 }
 const character = new Character(options);
-console.log(character);
+console.log(moment());
+const tasks = new Tasks({
+    id: 100,
+    parentId: 0,
+    sprintId: [],
+    name: '',
+    description: '',
+    estimated: moment().add(2, 'days'),
+    charge: 0,
+    status: 'new',
+});
+console.log(tasks.get('estimated'), tasks.isFinished());
