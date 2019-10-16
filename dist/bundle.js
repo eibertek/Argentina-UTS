@@ -17824,11 +17824,11 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
         sprintId: [],
         name: '',
         description: '',
-        estimated: moment().add(2, 'days'),
+        estimated: moment().add(7, 'days'),
         charge: 0,
         status: 'new',
     });
-    console.log(tasks.get('estimated'), tasks.isFinished());
+    console.log(tasks.get('estimated'), tasks.isFinished() > 0);
 }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 

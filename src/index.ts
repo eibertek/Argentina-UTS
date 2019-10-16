@@ -24,8 +24,8 @@ const tasks = new Tasks({
     sprintId: [],
     name: '',
     description: '',
-    estimated: moment().add(2, 'days'),
+    estimated: moment().add(7, 'days'),
     charge: 0,
     status: 'new',
 });
-console.log(tasks.get('estimated'), tasks.isFinished());
+console.log(tasks.get('estimated'), tasks.isFinished()>0);
