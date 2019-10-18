@@ -17731,30 +17731,103 @@ module.exports = function(module) {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, exports, __webpack_require__(/*! moment */ "./node_modules/moment/moment.js")], __WEBPACK_AMD_DEFINE_RESULT__ = (function (require, exports, moment) {
+var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, exports, __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"), __webpack_require__(/*! ./driver */ "./src/Tasks/driver.ts")], __WEBPACK_AMD_DEFINE_RESULT__ = (function (require, exports, moment, driver_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    class Tasks {
+    class Tasks extends driver_1.default {
         constructor(props) {
-            this.create = () => {
+            super();
+            this.dataStruct = {};
+            this.load = (id) => {
+                this.props = this.getData(id);
             };
-            this.set = () => {
+            this.save = () => {
+                this.onSave();
+            };
+            this.set = ([prop, value]) => {
+                this.props[prop] = value;
             };
             this.get = (value) => {
                 return this.props[value];
             };
-            this.addTime = () => {
+            this.changeTime = ({ amount, time = 'hours' }) => {
+                if (amount > 0) {
+                    this.props.estimated.add(amount, time);
+                }
+                else {
+                    this.props.estimated.subtract(amount, time);
+                }
             };
-            this.changeStatus = () => {
+            this.validateStatus = (status) => {
+                const oldStatus = this.props.status;
+                console.log(oldStatus, status);
+                switch (status) {
+                    case 'FIXED':
+                        if (oldStatus !== 'QA' && oldStatus !== 'NEW')
+                            throw "You cant change to FIXED if not NEW or QA";
+                        break;
+                    case 'QA':
+                        if (oldStatus !== 'IN PROGRESS')
+                            throw "You cant change to QA if old status is not IN PROGRESS";
+                        break;
+                    default:
+                        break;
+                }
+            };
+            this.changeStatus = (status) => {
+                try {
+                    this.validateStatus(status);
+                }
+                catch (e) {
+                    return e;
+                }
+                this.props.status = status;
             };
             this.isFinished = () => {
                 return moment.duration(this.props.estimated.diff(moment())).asHours();
             };
-            this.props = props;
+            this.init(this.dataStruct);
+            if (props.id) {
+                this.load(props.id);
+            }
+            else {
+                this.props = props;
+            }
         }
     }
     exports.Tasks = Tasks;
     exports.default = Tasks;
+}).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ }),
+
+/***/ "./src/Tasks/driver.ts":
+/*!*****************************!*\
+  !*** ./src/Tasks/driver.ts ***!
+  \*****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, exports], __WEBPACK_AMD_DEFINE_RESULT__ = (function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    class Driver {
+        constructor() {
+            this.init = (dataStruct) => {
+                console.log('init data');
+            };
+            this.onSave = () => {
+                console.log('save data');
+            };
+            this.getData = (id) => {
+                console.log('save data');
+                return {};
+            };
+        }
+    }
+    exports.default = Driver;
 }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
@@ -17819,16 +17892,20 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
     const character = new character_1.default(options);
     console.log(moment());
     const tasks = new Tasks_1.default({
-        id: 100,
+        //   id: 100,
         parentId: 0,
         sprintId: [],
         name: '',
         description: '',
-        estimated: moment().add(7, 'days'),
+        estimated: moment(),
         charge: 0,
-        status: 'new',
+        status: 'NEW',
     });
-    console.log(tasks.get('estimated'), tasks.isFinished() > 0);
+    console.log(tasks.isFinished() > 0);
+    tasks.set(['name', 'Mariano']);
+    tasks.changeTime({ amount: 2 });
+    console.log(tasks.changeStatus('FIXED'));
+    console.log(tasks.get('estimated').format('D-M-Y H:m'), moment());
 }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 

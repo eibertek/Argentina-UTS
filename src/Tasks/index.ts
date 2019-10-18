@@ -55,4 +55,16 @@
         remove()
         isPending()
     }
+
+
+    Tareas:
+
+    crear tarea --> para crear una nueva tarea
+    getFormData --> metodo para poder hacer los formularios, 
+                    devuelve un objeto con los tipos de prop
+    save()      --> el save se encarga de comunicarse 
+                    con el driver guardar la info y devolver el estado.
+    load()      --> carga los datos desde el driver.
+
+    cuando carga uno o el otro?
 */
