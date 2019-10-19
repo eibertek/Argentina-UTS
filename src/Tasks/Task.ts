@@ -1,10 +1,10 @@
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import Driver from './driver';
+import Driver, { DataStruct } from '../driver';
 
 declare type Status = 'NEW' | 'IN PROGRESS' | 'QA' | 'FINISH' | 'FIXED';
 
-declare type TasksProps = {
+export declare type TaskProps = {
     id?: number;
     parentId: number;
     sprintId: Array<number>;
@@ -15,35 +15,58 @@ declare type TasksProps = {
     status: Status;
 }
 
-export class Tasks extends Driver {
+const dataStruct:DataStruct ={
+    type: 'STORAGE',
+    collectionName: 'Tasks',
+    connectionString: '',
+};
 
-        private props: TasksProps;
-        private readonly dataStruct = {};
+export class Task extends Driver {
 
-        constructor(props:TasksProps){
-            super();
-            this.init(this.dataStruct);
+        private props: TaskProps;
+
+        constructor(props:TaskProps){            
+            super(dataStruct);
             if(props.id) {
-                this.load(props.id);
+                this.props = this.load(props);
             }else{
-                this.props = props;
+                this.props = { id:Math.random()*1000000, ...props};
             }
         }
 
-        private load = (id:number) => {
-            this.props = <TasksProps>this.getData(id);
+        public static getAll = () => {
+            return Task.getCollection(dataStruct).map((el:TaskProps) => new Task(el));
+
         }
 
+        private load = (props: TaskProps) => {
+            const loadedProps = <TaskProps>this.getData(props.id);
+            if(!loadedProps) {
+                this.loadedItem = false;
+                return props;
+            }
+            this.loadedItem = true;
+            loadedProps.estimated = moment(loadedProps.estimated);
+            return loadedProps;
+        }
+
+        public isLoaded = () => this.loadedItem;
+
         public save = () => {
-            this.onSave();
+            this.onSave(this.props);
+            this.loadedItem = true;
         }
 
         public set = ([prop, value]) => {
             this.props[prop] = value;
         }
 
-        public get = (value) => {
-            return this.props[value];
+        public get = (value=null) => {
+            return value ? this.props[value] : this.props;
+        }
+        
+        public delete = () => {
+            this.onDelete(this.props);
         }
 
         public changeTime = ({amount, time='hours'}) => {
@@ -56,7 +79,6 @@ export class Tasks extends Driver {
 
         private validateStatus = (status: Status) => {
             const oldStatus = this.props.status;
-            console.log(oldStatus, status);
             switch (status) {
                 case 'FIXED':
                     if(oldStatus !== 'QA' && oldStatus !== 'NEW' )
@@ -78,6 +100,7 @@ export class Tasks extends Driver {
                 return e;
             }
             this.props.status = status;
+            return;
         }
 
         public isFinished = () => {
@@ -85,5 +108,3 @@ export class Tasks extends Driver {
         }
 
 }
-
-export default Tasks;

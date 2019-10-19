@@ -17724,31 +17724,47 @@ module.exports = function(module) {
 
 /***/ }),
 
-/***/ "./src/Tasks/Tasks.ts":
-/*!****************************!*\
-  !*** ./src/Tasks/Tasks.ts ***!
-  \****************************/
+/***/ "./src/Tasks/Task.ts":
+/*!***************************!*\
+  !*** ./src/Tasks/Task.ts ***!
+  \***************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, exports, __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"), __webpack_require__(/*! ./driver */ "./src/Tasks/driver.ts")], __WEBPACK_AMD_DEFINE_RESULT__ = (function (require, exports, moment, driver_1) {
+var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, exports, __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"), __webpack_require__(/*! ../driver */ "./src/driver.ts")], __WEBPACK_AMD_DEFINE_RESULT__ = (function (require, exports, moment, driver_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    class Tasks extends driver_1.default {
+    const dataStruct = {
+        type: 'STORAGE',
+        collectionName: 'Tasks',
+        connectionString: '',
+    };
+    class Task extends driver_1.default {
         constructor(props) {
-            super();
-            this.dataStruct = {};
-            this.load = (id) => {
-                this.props = this.getData(id);
+            super(dataStruct);
+            this.load = (props) => {
+                const loadedProps = this.getData(props.id);
+                if (!loadedProps) {
+                    this.loadedItem = false;
+                    return props;
+                }
+                this.loadedItem = true;
+                loadedProps.estimated = moment(loadedProps.estimated);
+                return loadedProps;
             };
+            this.isLoaded = () => this.loadedItem;
             this.save = () => {
-                this.onSave();
+                this.onSave(this.props);
+                this.loadedItem = true;
             };
             this.set = ([prop, value]) => {
                 this.props[prop] = value;
             };
-            this.get = (value) => {
-                return this.props[value];
+            this.get = (value = null) => {
+                return value ? this.props[value] : this.props;
+            };
+            this.delete = () => {
+                this.onDelete(this.props);
             };
             this.changeTime = ({ amount, time = 'hours' }) => {
                 if (amount > 0) {
@@ -17760,7 +17776,6 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             };
             this.validateStatus = (status) => {
                 const oldStatus = this.props.status;
-                console.log(oldStatus, status);
                 switch (status) {
                     case 'FIXED':
                         if (oldStatus !== 'QA' && oldStatus !== 'NEW')
@@ -17782,83 +17797,219 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
                     return e;
                 }
                 this.props.status = status;
+                return;
             };
             this.isFinished = () => {
                 return moment.duration(this.props.estimated.diff(moment())).asHours();
             };
-            this.init(this.dataStruct);
             if (props.id) {
-                this.load(props.id);
+                this.props = this.load(props);
             }
             else {
-                this.props = props;
+                this.props = { id: Math.random() * 1000000, ...props };
             }
         }
     }
-    exports.Tasks = Tasks;
-    exports.default = Tasks;
+    exports.Task = Task;
+    Task.getAll = () => {
+        return Task.getCollection(dataStruct).map((el) => new Task(el));
+    };
 }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
 /***/ }),
 
-/***/ "./src/Tasks/driver.ts":
-/*!*****************************!*\
-  !*** ./src/Tasks/driver.ts ***!
-  \*****************************/
+/***/ "./src/Tasks/index.ts":
+/*!****************************!*\
+  !*** ./src/Tasks/index.ts ***!
+  \****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, exports, __webpack_require__(/*! ./Task */ "./src/Tasks/Task.ts")], __WEBPACK_AMD_DEFINE_RESULT__ = (function (require, exports, Task_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = Task_1.Task;
+}).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+/*
+** Task mini app for creating the game
+*
+*   Class Task
+        {
+            id
+            parentId
+            sprintId[]
+            name
+            description
+            estimated
+            charge
+            status
+
+            create()
+            set()
+            addTime()
+            changeStatus()
+            isFinished()
+
+        }
+    Class Sprint
+        {
+            id
+            name
+            number
+            startTime
+            finishTime
+            status
+
+            create()
+            addTask()
+            removeTask()
+            changeStatus()
+            isFinished()
+            isOverdue()
+        }
+        
+    type status {
+        FINISH
+        OPEN
+        READY
+        CLOSE
+        WAIT
+    }
+
+    Class Alerts
+    {
+        id
+        taskId
+        alertTime
+
+        create()
+        run()
+        pause()
+        remove()
+        isPending()
+    }
+
+
+    Tareas:
+
+    crear tarea --> para crear una nueva tarea
+    getFormData --> metodo para poder hacer los formularios,
+                    devuelve un objeto con los tipos de prop
+    save()      --> el save se encarga de comunicarse
+                    con el driver guardar la info y devolver el estado.
+    load()      --> carga los datos desde el driver.
+
+    cuando carga uno o el otro?
+*/ 
+
+
+/***/ }),
+
+/***/ "./src/driver.ts":
+/*!***********************!*\
+  !*** ./src/driver.ts ***!
+  \***********************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, exports], __WEBPACK_AMD_DEFINE_RESULT__ = (function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    exports.STORAGE = 'STORAGE';
+    exports.SQL = 'SQL';
+    exports.GRAPHQL = 'GRAPHQL';
+    ;
     class Driver {
-        constructor() {
-            this.init = (dataStruct) => {
-                console.log('init data');
+        constructor(dataStruct) {
+            this.debugMode = true;
+            this.loadedItem = false;
+            this.init = () => {
+                this.connector = new DriverConnector(this.dataStruct.type, this.dataStruct.collectionName);
+                if (this.debugMode)
+                    console.log('init data');
             };
-            this.onSave = () => {
-                console.log('save data');
+            this.onSave = (data) => {
+                let collection = this.connector.getCollection();
+                if (!this.loadedItem) {
+                    collection.push(data);
+                }
+                else {
+                    collection = [...collection.filter(item => item.id !== data.id), data];
+                }
+                this.connector.setCollection(collection);
+            };
+            this.onDelete = (data) => {
+                let collection = this.connector.getCollection();
+                collection = collection.filter(item => item.id !== data.id);
+                this.connector.setCollection(collection);
             };
             this.getData = (id) => {
-                console.log('save data');
-                return {};
+                const collection = this.connector.getCollection();
+                if (!id)
+                    return collection;
+                const [item] = collection.filter(item => item.id === id);
+                return item;
             };
+            this.dataStruct = dataStruct;
+            this.init();
         }
     }
     exports.default = Driver;
-}).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-/***/ }),
-
-/***/ "./src/character.ts":
-/*!**************************!*\
-  !*** ./src/character.ts ***!
-  \**************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, exports], __WEBPACK_AMD_DEFINE_RESULT__ = (function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    class Character {
-        constructor({ name, lastname, age, degree, party, stats }) {
-            this.chargeId = null;
-            this.asignTo = (chargeId) => {
-                this.chargeId = chargeId;
+    Driver.getCollection = (dataStruct) => {
+        const connector = new DriverConnector(dataStruct.type, dataStruct.collectionName);
+        return connector.getCollection();
+    };
+    class DriverConnector {
+        constructor(type, key) {
+            this.connectionInstance = null;
+            this.key = '';
+            this.setCollection = (data) => {
+                this.connectionInstance.setData(this.key, data);
+                return true;
             };
-            this.name = name;
-            this.lastname = lastname;
-            this.age = age;
-            this.degree = degree;
-            this.party = party;
-            this.stats = stats;
+            this.getCollection = (query = '') => {
+                const data = this.connectionInstance.getData(this.key);
+                return data;
+            };
+            this.key = key;
+            switch (type) {
+                case exports.STORAGE:
+                    //storage initiation
+                    this.connectionInstance = new StorageConnector();
+                    break;
+                case exports.SQL:
+                    //sql initiation
+                    this.connectionInstance = new SQLConnector();
+                    break;
+                case exports.GRAPHQL:
+                    //graphql initiation
+                    this.connectionInstance = new GraphQLConnector();
+                    break;
+                default:
+                    break;
+            }
         }
     }
-    exports.default = Character;
+    class StorageConnector {
+        constructor() {
+            this.setData = (key, data) => {
+                return localStorage.setItem(key, JSON.stringify(data));
+            };
+            this.getData = (key) => {
+                const item = localStorage.getItem(key);
+                if (!item)
+                    return [];
+                return JSON.parse(item);
+            };
+        }
+    }
+    class SQLConnector {
+    }
+    class GraphQLConnector {
+    }
 }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
@@ -17872,12 +18023,12 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, exports, __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"), __webpack_require__(/*! ./character */ "./src/character.ts"), __webpack_require__(/*! ./Tasks/Tasks */ "./src/Tasks/Tasks.ts")], __WEBPACK_AMD_DEFINE_RESULT__ = (function (require, exports, moment, character_1, Tasks_1) {
+var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__, exports, __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"), __webpack_require__(/*! ./Tasks */ "./src/Tasks/index.ts")], __WEBPACK_AMD_DEFINE_RESULT__ = (function (require, exports, moment, Tasks_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const options = {
-        name: 'Mariano',
-        lastname: 'Eiberman',
+        name: 'Danny',
+        lastname: 'Rand',
         age: 34,
         degree: 'Lawyer',
         party: 'UC',
@@ -17889,23 +18040,43 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             publicRelations: 30
         },
     };
-    const character = new character_1.default(options);
-    console.log(moment());
-    const tasks = new Tasks_1.default({
-        //   id: 100,
+    //const storage = localStorage.getItem('tasks');
+    //const character = new Character(options);
+    const newTaskProps = {
+        //   id: 863444.5801060748,
+        id: 911872.0679615744,
         parentId: 0,
         sprintId: [],
         name: '',
-        description: '',
+        description: 'this task is old',
         estimated: moment(),
         charge: 0,
         status: 'NEW',
-    });
-    console.log(tasks.isFinished() > 0);
-    tasks.set(['name', 'Mariano']);
-    tasks.changeTime({ amount: 2 });
-    console.log(tasks.changeStatus('FIXED'));
-    console.log(tasks.get('estimated').format('D-M-Y H:m'), moment());
+    };
+    const tasks = new Tasks_1.default(newTaskProps);
+    const debugElement = document.getElementById('debug');
+    const datatable = document.getElementById('datatable');
+    const allData = Tasks_1.default.getAll();
+    datatable.innerHTML = datatable.innerHTML + allData.map(element => {
+        return `
+        <tr>
+        <td></td>
+        <td>${element.get('id')}</td>
+        <td>${element.get('name')}</td>
+        <td>${element.get('description')}</td>
+        <td>${element.isFinished()}</td>
+    </tr>`;
+    }).join('');
+    // tasks.set(['name', 'Maria Carey']);
+    // tasks.set(['description', 'Task Old']);
+    // tasks.changeTime({ amount:2 });
+    // const changeStatus = tasks.changeStatus('FIXED');
+    // tasks.save();
+    debugElement.innerHTML = ` 
+    ${tasks.get('estimated').format('D-M-Y H:m')} <br />
+    <pre style="width:300px">${JSON.stringify(tasks.get())}</pre> <br />
+    ${localStorage.getItem('Tasks').length}
+`;
 }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 

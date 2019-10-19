@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "start": "webpack --dev"
+    "start": "webpack --dev --watch"
   },
   "dependencies": {
     "ts-loader": "^6.2.0"

@@ -1,3 +1,7 @@
+import { Task } from './Task';
+export { TaskProps } from './Task'; 
+
+export default Task;
 /*
 ** Task mini app for creating the game
 *  
@@ -50,6 +54,7 @@
         taskId
         alertTime
 
+        create()
         run()
         pause()
         remove()
